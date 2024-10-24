@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fedimint Web Extension Hermes Addresses</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      h1 {
+        color: #333;
+      }
+      input,
+      button {
+        margin: 10px 0;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Fedimint Web Extension Hermes Addresses</h1>
+    <form id="addressForm">
+      <input type="text" id="name" placeholder="Enter name" required />
+      <br />
+      <input type="text" id="publicKey" placeholder="Public Key" readonly />
+      <br />
+      <button type="button" onclick="linkPubkey()">Link pubkey</button>
+      <br />
+      <button type="submit">Submit</button>
+    </form>
+
+    <script>
+      async function linkPubkey() {
+        try {
+          const pubkey = await window.nostr.getPublicKey();
+          document.getElementById("publicKey").value = pubkey;
+        } catch (error) {
+          console.error("Error getting public key:", error);
+          alert(
+            "Failed to get public key. Make sure you have a Nostr extension installed."
+          );
+        }
+      }
+
+      document
+        .getElementById("addressForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const name = document.getElementById("name").value;
+          const publicKey = document.getElementById("publicKey").value;
+
+          if (!name || !publicKey) {
+            alert("Please enter a name and link a public key.");
+            return;
+          }
+
+          try {
+            const response = await fetch("/api/submit-address", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ name, publicKey }),
+            });
+
+            if (response.ok) {
+              alert("Address submitted successfully!");
+              // Clear the form
+              document.getElementById("name").value = "";
+              document.getElementById("publicKey").value = "";
+            } else {
+              alert("Failed to submit address. Please try again.");
+            }
+          } catch (error) {
+            console.error("Error submitting address:", error);
+            alert("An error occurred while submitting the address.");
+          }
+        });
+    </script>
+  </body>
+</html>

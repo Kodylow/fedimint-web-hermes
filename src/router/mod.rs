@@ -31,8 +31,8 @@ pub async fn create_router(state: AppState) -> Result<Router> {
 
 #[derive(Template)]
 #[template(path = "index.html")]
-struct IndexTemplate {}
+pub struct HtmlTemplate {}
 
-pub async fn handle_index_html(State(_): State<AppState>) -> impl IntoResponse {
-    IndexTemplate {}.render().unwrap()
+pub async fn handle_index_html(State(_): State<AppState>) -> HtmlTemplate {
+    HtmlTemplate {}
 }
